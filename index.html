@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
+    <style>
+        body {background-color: #000; margin: 0; padding: 0;}
+        canvas {display: block;} /* Remove any gaps around the canvas */
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import init, { create_particles, render_particles, adjust_canvas_size } from './pkg/rustparticles.js';
+
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      async function run() {
+        await init();
+
+        // Set up canvas dimensions
+        resizeCanvas();
+
+        // Initialize particles
+        create_particles(canvas.width, canvas.height, 1000);
+
+        // Animation loop
+        function loop() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+          render_particles(); // Render particles
+          requestAnimationFrame(loop); // Repeat the loop
+        }
+        loop();
+      }
+
+      // Resize canvas to fit the window
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Recreate particles for the new canvas size
+        adjust_canvas_size(canvas.width, canvas.height);
+      }
+
+      // Listen for window resize events
+      window.addEventListener("resize", () => {
+        resizeCanvas();
+      });
+
+      run();
+
+      // Function to draw a particle (uses the already initialized ctx)
+      window.draw_particle = function (x, y, color, size) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, size, size);
+      };
+    </script>
+
+    <canvas id="canvas"></canvas>
+  </body>
+</html>
